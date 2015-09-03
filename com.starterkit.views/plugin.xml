@@ -5,22 +5,9 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            name="Sample View"
-            icon="icons/sample.gif"
-            category="com.starterkit.views"
-            class="com.starterkit.views.views.SampleView"
-            id="com.starterkit.views.views.SampleView">
-      </view>
-      <view
-            class="com.starterkit.views.ViewPart1"
-            id="com.starterkit.views.view1"
-            name="My View"
-            restorable="true">
-      </view>
-      <view
-            class="com.starterkit.views.SomeView"
-            id="com.starterkit.views.SomeView"
-            name="Some View"
+            class="com.starterkit.views.EditView"
+            id="com.starterkit.views.EditView"
+            name="Edit View"
             restorable="true">
       </view>
       <view
@@ -29,39 +16,39 @@
             name="Tasks"
             restorable="true">
       </view>
+      <view
+            class="com.starterkit.views.ArchiveView"
+            id="com.starterkit.views.ArchiveView"
+            name="Archive View"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
-            targetID="com.starterkit.views.perspective1">
+            targetID="com.starterkit.views.tasks">
          <view
-               ratio="0.5"
-               relative="org.eclipse.ui.views.ProblemView"
+               id="com.starterkit.views.TaskView"
+               ratio="0.75"
                relationship="top"
-               id="com.starterkit.views.views.SampleView">
+               relative="org.eclipse.help.ui.HelpView">
          </view>
          <view
-               id="com.starterkit.views.view1"
+               id="com.starterkit.views.EditView"
                minimized="false"
-               ratio="0.67"
+               ratio="0.65"
                relationship="right"
-               relative="com.starterkit.views.views.SampleView">
+               relative="com.starterkit.views.TaskView">
          </view>
       </perspectiveExtension>
       <perspectiveExtension
             targetID="com.starterkit.views.archive">
          <view
-               id="com.starterkit.views.TaskView"
-               ratio="0.75"
+               id="com.starterkit.views.ArchiveView"
+               minimized="false"
+               ratio="0.9"
                relationship="top"
                relative="org.eclipse.ui.views.ProblemView">
-         </view>
-         <view
-               id="com.starterkit.views.SomeView"
-               minimized="false"
-               ratio="0.65"
-               relationship="right"
-               relative="com.starterkit.views.TaskView">
          </view>
       </perspectiveExtension>
    </extension>
@@ -74,12 +61,12 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="com.starterkit.views.PerspectiveFactory1"
-            id="com.starterkit.views.perspective1"
-            name="Starterkit">
+            class="com.starterkit.views.TaskPerspectiveFactory"
+            id="com.starterkit.views.tasks"
+            name="TODOs">
       </perspective>
       <perspective
-            class="com.starterkit.views.ArchivePerspective"
+            class="com.starterkit.views.ArchivePerspectiveFactory"
             id="com.starterkit.views.archive"
             name="Archive">
       </perspective>
@@ -91,7 +78,7 @@
             locationURI="menu:org.eclipse.ui.main.menu">
          <command
                commandId="com.starterkit.views.command1"
-               label="MmMmM"
+               label="Me mad bro"
                style="push">
          </command>
       </menuContribution>

@@ -22,7 +22,13 @@ public class Action implements IHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		MessageDialog.openQuestion(null, "WUT?", "You mad?");
+		boolean mad = MessageDialog.openQuestion(null, "WUT?", "You mad?");
+		if(mad){
+			boolean rlyMad = MessageDialog.openQuestion(null, "Mad?", "RLY Bro?");
+			if(rlyMad){
+				System.exit(0);
+			}
+		}
 		return null;
 	}
 

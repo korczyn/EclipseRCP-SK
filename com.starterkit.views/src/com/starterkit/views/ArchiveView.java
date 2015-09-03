@@ -1,10 +1,9 @@
 package com.starterkit.views;
 
-import org.eclipse.core.databinding.beans.BeanProperties;
-import org.eclipse.core.databinding.observable.list.WritableList;
+import org.eclipse.core.databinding.observable.list.IObservableList;
+import org.eclipse.core.databinding.property.Properties;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.databinding.viewers.ViewerSupport;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -19,15 +18,18 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.part.ViewPart;
 
 import com.starterkit.views.model.ModelProvider;
+import com.starterkit.views.model.Person;
 import com.starterkit.views.model.Task;
 
-public class TaskView extends ViewPart {
+public class ArchiveView extends ViewPart {
 
-	public static final String ID = "com.starterkit.views.ArchiveView";
-	public static final String perspectiveID = "com.starterkit.views.archive";
 	private TableViewer viewer;
 
-	public TaskView() {
+	public ArchiveView() {
+	}
+	
+	public ViewPart getView(){
+		return this;
 	}
 
 	@Override
@@ -35,7 +37,6 @@ public class TaskView extends ViewPart {
 		GridLayout layout = new GridLayout(2, false);
 		parent.setLayout(layout);
 		createViewer(parent);
-
 	}
 
 	public void refresh() {
@@ -51,32 +52,34 @@ public class TaskView extends ViewPart {
 		table.setLinesVisible(true);
 
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
-		WritableList input = new WritableList(
-				ModelProvider.INSTANCE.getTasks(), Task.class);
-		ViewerSupport.bind(
-				viewer,
-				input,
-				BeanProperties.values(new String[] { "id", "name", "status",
-						"date", "info" }));
-
+		IObservableList input = 
+				   Properties.selfList(Person.class).observe(ModelProvider.INSTANCE.getArchive());
 		viewer.setInput(input);
-		getSite().setSelectionProvider(viewer);
 
+		getSite().setSelectionProvider(viewer);
+		
+		
 		MenuManager manager = new MenuManager();
 		viewer.getControl().setMenu(
 				manager.createContextMenu(viewer.getControl()));
-
-		manager.add(new Action("Send to archive") {
+		manager.add(new Action("Revert from archive") {
 			@Override
 			public void run() {
 				IStructuredSelection selection = (IStructuredSelection) viewer
 						.getSelection();
-				Object o = selection.getFirstElement();
-				if (o instanceof Task) {
-					Task t = (Task) o;
-					ModelProvider.INSTANCE.sendToArchive(t);
-					refresh();
+				
+				Object t = selection.getFirstElement();
+				if (t instanceof Task){
+					Task task = (Task) t;
+					ModelProvider.INSTANCE.sendToTasks(task);
 				}
+				refresh();
+			}
+		});
+		manager.add(new Action("Refresh") {
+			@Override
+			public void run() {
+				refresh();
 			}
 		});
 
