@@ -18,13 +18,14 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.part.ViewPart;
 
-import com.starterkit.views.model.ModelProvider;
+import com.starterkit.views.model.SortBy;
+import com.starterkit.views.model.Status;
 import com.starterkit.views.model.Task;
+import com.starterkit.views.provider.ModelProvider;
 
 public class TaskView extends ViewPart {
 
 	public static final String ID = "com.starterkit.views.ArchiveView";
-	public static final String perspectiveID = "com.starterkit.views.archive";
 	private TableViewer viewer;
 
 	public TaskView() {
@@ -35,7 +36,6 @@ public class TaskView extends ViewPart {
 		GridLayout layout = new GridLayout(2, false);
 		parent.setLayout(layout);
 		createViewer(parent);
-
 	}
 
 	public void refresh() {
@@ -43,7 +43,7 @@ public class TaskView extends ViewPart {
 	}
 
 	private void createViewer(Composite parent) {
-		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
+		viewer = new TableViewer(parent, SWT.SINGLE | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 		createColumns(parent, viewer);
 		final Table table = viewer.getTable();
@@ -62,6 +62,121 @@ public class TaskView extends ViewPart {
 		viewer.setInput(input);
 		getSite().setSelectionProvider(viewer);
 
+		MenuManager manager = fillMenu();
+		viewer.getControl().setMenu(
+				manager.createContextMenu(viewer.getControl()));
+
+		GridData gridData = new GridData();
+		gridData.verticalAlignment = GridData.FILL;
+		gridData.horizontalSpan = 2;
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.grabExcessVerticalSpace = true;
+		gridData.horizontalAlignment = GridData.FILL;
+		viewer.getControl().setLayoutData(gridData);
+	}
+
+	public MenuManager fillMarkAsSubmenu() {
+		MenuManager subMenu = new MenuManager("Mark as ...");
+		subMenu.add(new Action("Not started") {
+			@Override
+			public void run() {
+				IStructuredSelection selection = (IStructuredSelection) viewer
+						.getSelection();
+				Object o = selection.getFirstElement();
+				if (o instanceof Task) {
+					Task t = (Task) o;
+					t.setStatus(Status.NOT_STARTED);
+					ModelProvider.INSTANCE.changeTask(t);
+					refresh();
+				}
+			}
+		});
+		subMenu.add(new Action("In Progress") {
+			@Override
+			public void run() {
+				IStructuredSelection selection = (IStructuredSelection) viewer
+						.getSelection();
+				Object o = selection.getFirstElement();
+				if (o instanceof Task) {
+					Task t = (Task) o;
+					t.setStatus(Status.IN_PROGRESS);
+					ModelProvider.INSTANCE.changeTask(t);
+					refresh();
+				}
+			}
+		});
+		subMenu.add(new Action("Canceled") {
+			@Override
+			public void run() {
+				IStructuredSelection selection = (IStructuredSelection) viewer
+						.getSelection();
+				Object o = selection.getFirstElement();
+				if (o instanceof Task) {
+					Task t = (Task) o;
+					t.setStatus(Status.CANCELED);
+					ModelProvider.INSTANCE.changeTask(t);
+					refresh();
+				}
+			}
+		});
+		subMenu.add(new Action("Failed") {
+			@Override
+			public void run() {
+				IStructuredSelection selection = (IStructuredSelection) viewer
+						.getSelection();
+				Object o = selection.getFirstElement();
+				if (o instanceof Task) {
+					Task t = (Task) o;
+					t.setStatus(Status.FAILED);
+					ModelProvider.INSTANCE.changeTask(t);
+					refresh();
+				}
+			}
+		});
+		subMenu.add(new Action("Done") {
+			@Override
+			public void run() {
+				IStructuredSelection selection = (IStructuredSelection) viewer
+						.getSelection();
+				Object o = selection.getFirstElement();
+				if (o instanceof Task) {
+					Task t = (Task) o;
+					t.setStatus(Status.DONE);
+					ModelProvider.INSTANCE.changeTask(t);
+					refresh();
+				}
+			}
+		});
+		return subMenu;
+	}
+
+	public MenuManager fillSortMenu() {
+		MenuManager subMenu = new MenuManager("Sort by ...");
+		subMenu.add(new Action("ID") {
+			@Override
+			public void run() {
+				ModelProvider.INSTANCE.sortBy(SortBy.ID);
+				refresh();
+			}
+		});
+		subMenu.add(new Action("Name") {
+			@Override
+			public void run() {
+				ModelProvider.INSTANCE.sortBy(SortBy.NAME);
+				refresh();
+			}
+		});
+		subMenu.add(new Action("Status") {
+			@Override
+			public void run() {
+				ModelProvider.INSTANCE.sortBy(SortBy.STATUS);
+				refresh();
+			}
+		});
+		return subMenu;
+	}
+
+	public MenuManager fillMenu() {
 		MenuManager manager = new MenuManager();
 		viewer.getControl().setMenu(
 				manager.createContextMenu(viewer.getControl()));
@@ -79,15 +194,12 @@ public class TaskView extends ViewPart {
 				}
 			}
 		});
+		MenuManager markAsSubmenu = fillMarkAsSubmenu();
+		manager.add(markAsSubmenu);
+		MenuManager sortSubmenu = fillSortMenu();
+		manager.add(sortSubmenu);
 
-		GridData gridData = new GridData();
-		gridData.verticalAlignment = GridData.FILL;
-		gridData.horizontalSpan = 2;
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.grabExcessVerticalSpace = true;
-		gridData.horizontalAlignment = GridData.FILL;
-		viewer.getControl().setLayoutData(gridData);
-
+		return manager;
 	}
 
 	public TableViewer getViewer() {

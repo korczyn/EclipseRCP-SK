@@ -61,12 +61,12 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="com.starterkit.views.TaskPerspectiveFactory"
+            class="com.starterkit.perpectives.TaskPerspectiveFactory"
             id="com.starterkit.views.tasks"
             name="TODOs">
       </perspective>
       <perspective
-            class="com.starterkit.views.ArchivePerspectiveFactory"
+            class="com.starterkit.perpectives.ArchivePerspectiveFactory"
             id="com.starterkit.views.archive"
             name="Archive">
       </perspective>

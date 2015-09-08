@@ -16,10 +16,10 @@ public class Task {
 
 	}
 
-	public Task(Long id, String name, String status, String date, String info) {
+	public Task(Long id, String name, Status status, String date, String info) {
 		this.id = id;
 		this.name = name;
-		this.status = status;
+		this.status = status.getValue();
 		this.date = date;
 		this.info = info;
 	}
@@ -53,8 +53,8 @@ public class Task {
 		return status;
 	}
 	
-	public void setStatus(String status){
-		propertyChangeSupport.firePropertyChange("status", this.status, this.status = status);
+	public void setStatus(Status status){
+		propertyChangeSupport.firePropertyChange("status", this.status, this.status = status.getValue());
 	}
 
 	public String getDate() {

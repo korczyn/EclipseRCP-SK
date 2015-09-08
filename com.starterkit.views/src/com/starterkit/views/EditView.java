@@ -1,5 +1,7 @@
 package com.starterkit.views;
 
+import java.util.ResourceBundle;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -18,11 +20,9 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 
-import com.starterkit.views.model.ModelProvider;
+import com.starterkit.views.model.Status;
 import com.starterkit.views.model.Task;
-import java.util.ResourceBundle;
-import org.eclipse.swt.dnd.DropTarget;
-import org.eclipse.swt.dnd.DND;
+import com.starterkit.views.provider.ModelProvider;
 
 public class EditView extends ViewPart {
 	private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("com.starterkit.views.messages"); //$NON-NLS-1$
@@ -60,7 +60,7 @@ public class EditView extends ViewPart {
 		for (int i = 0; i < times.length; i++) {
 			times[i] = times[i].replaceFirst("^0+(?!$)", "");
 		}
-
+		
 		dateTime.setDay(Integer.parseInt(times[0]));
 		dateTime.setMonth(Integer.parseInt(times[1]) - 1);
 		dateTime.setYear(Integer.parseInt(times[2]));
@@ -119,11 +119,11 @@ public class EditView extends ViewPart {
 		statusCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
 				false, 2, 1));
 		statusCombo.add("", 0);
-		statusCombo.add("Done", 1);
-		statusCombo.add("Failed", 2);
-		statusCombo.add("Canceled", 3);
-		statusCombo.add("In progress", 4);
-		statusCombo.add("Not started", 5);
+		statusCombo.add(Status.DONE.getValue(), 1);
+		statusCombo.add(Status.FAILED.getValue(), 2);
+		statusCombo.add(Status.CANCELED.getValue(), 3);
+		statusCombo.add(Status.IN_PROGRESS.getValue(), 4);
+		statusCombo.add(Status.NOT_STARTED.getValue(), 5);
 		
 				Label lblInfo = new Label(parent, SWT.NONE);
 				lblInfo.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false,
@@ -145,7 +145,7 @@ public class EditView extends ViewPart {
 					public void widgetSelected(SelectionEvent e) {
 						if (isEverythingFilled()) {
 							Task t = new Task(Long.valueOf(idField.getText()),
-									nameField.getText(), statusCombo.getText(),
+									nameField.getText(), Status.getStatusByValue(statusCombo.getText()),
 									dateToString(), infoField.getText());
 							ModelProvider.INSTANCE.changeTask(t);
 							clearFields();
@@ -168,8 +168,7 @@ public class EditView extends ViewPart {
 					@Override
 					public void widgetSelected(SelectionEvent e) {
 						if (isEverythingFilled()) {
-							Task task = new Task(null, nameField.getText(), statusCombo
-									.getText(), dateToString(), infoField.getText());
+							Task task = new Task(null, nameField.getText(), Status.getStatusByValue(statusCombo.getText()), dateToString(), infoField.getText());
 							ModelProvider.INSTANCE.addTask(task);
 							TaskView part = (TaskView) getViewSite().getPage()
 									.findView(EditView.ID);
@@ -231,7 +230,6 @@ public class EditView extends ViewPart {
 		new Label(parent, SWT.NONE);
 
 		getSite().getPage().addSelectionListener(listener);
-
 	}
 
 	private void clearFields() {

@@ -1,9 +1,10 @@
 package com.starterkit.views;
 
-import org.eclipse.core.databinding.observable.list.IObservableList;
-import org.eclipse.core.databinding.property.Properties;
+import org.eclipse.core.databinding.beans.BeanProperties;
+import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.databinding.viewers.ViewerSupport;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -17,9 +18,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.part.ViewPart;
 
-import com.starterkit.views.model.ModelProvider;
-import com.starterkit.views.model.Person;
 import com.starterkit.views.model.Task;
+import com.starterkit.views.provider.ModelProvider;
 
 public class ArchiveView extends ViewPart {
 
@@ -44,7 +44,7 @@ public class ArchiveView extends ViewPart {
 	}
 
 	private void createViewer(Composite parent) {
-		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
+		viewer = new TableViewer(parent, SWT.SINGLE | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 		createColumns(parent, viewer);
 		final Table table = viewer.getTable();
@@ -52,9 +52,13 @@ public class ArchiveView extends ViewPart {
 		table.setLinesVisible(true);
 
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
-		IObservableList input = 
-				   Properties.selfList(Person.class).observe(ModelProvider.INSTANCE.getArchive());
-		viewer.setInput(input);
+		WritableList input = new WritableList(
+				ModelProvider.INSTANCE.getArchive(), Task.class);
+		ViewerSupport.bind(
+				viewer,
+				input,
+				BeanProperties.values(new String[] { "id", "name", "status",
+						"date", "info" }));
 
 		getSite().setSelectionProvider(viewer);
 		
@@ -90,7 +94,6 @@ public class ArchiveView extends ViewPart {
 		gridData.grabExcessVerticalSpace = true;
 		gridData.horizontalAlignment = GridData.FILL;
 		viewer.getControl().setLayoutData(gridData);
-
 	}
 
 	public TableViewer getViewer() {
